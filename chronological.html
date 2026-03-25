@@ -87,6 +87,24 @@
         .action-btn:active { transform: scale(0.95); }
 
         footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+
+        /* ── Floating Left Sidebar Nav ───────────────────────────────── */
+        .site-nav { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 100; }
+        .nav-inner { display: flex; flex-direction: column; gap: 6px; background: rgba(15, 15, 23, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .nav-link { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #55556a; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: #dddde8; background: rgba(255,255,255,0.05); }
+        .nav-link.active { color: var(--gold); background: rgba(201,168,76,0.1); border-right: 2px solid var(--gold); }
+        .nav-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; opacity: 0.8; }
+        .nav-sep { width: 100%; height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
+
+        @media (max-width: 1150px) {
+            .site-nav { position: relative; left: auto; top: auto; transform: none; margin: 0 auto 40px; max-width: 780px; display: flex; justify-content: center; }
+            .nav-inner { flex-direction: row; overflow-x: auto; scrollbar-width: none; border-radius: 10px; padding: 5px; }
+            .nav-inner::-webkit-scrollbar { display: none; }
+            .nav-link { padding: 8px 12px; font-size: 11px; border-right: none; }
+            .nav-link.active { border-bottom: 2px solid var(--gold); border-right: none; }
+            .nav-sep { width: 1px; height: 16px; margin: 0 2px; align-self: center; }
+        }
     </style>
 </head>
 <body>
@@ -94,6 +112,30 @@
     <symbol id="icon-dl" viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M5 21h14"/></symbol>
     <symbol id="icon-wt" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
 </svg>
+
+<nav class="site-nav" data-page="chrono">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-link" data-key="home">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Main Storyline
+        </a>
+        <div class="nav-sep"></div>
+        <a href="movies-only.html" class="nav-link" data-key="movies">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+            Movies Only
+        </a>
+        <div class="nav-sep"></div>
+        <a href="completionist.html" class="nav-link" data-key="complete">
+            <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Completionist
+        </a>
+        <div class="nav-sep"></div>
+        <a href="chronological.html" class="nav-link" data-key="chrono">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Chronological
+        </a>
+    </div>
+</nav>
 
 <div class="wrap">
     <header>
@@ -242,6 +284,15 @@
     }
     document.querySelectorAll('.movie-row').forEach(initRow);
     updateProgress();
+
+    /* Active Nav Highlight Script */
+    (function() {
+        const nav = document.querySelector('.site-nav');
+        if (!nav) return;
+        const page = nav.dataset.page;
+        const link = nav.querySelector(`.nav-link[data-key="${page}"]`);
+        if (link) link.classList.add('active');
+    })();
 </script>
 </body>
 </html>
