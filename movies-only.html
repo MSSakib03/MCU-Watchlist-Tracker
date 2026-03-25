@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCU Classic Tracker (Movies Only)</title>
+    <meta name="description" content="The classic phase-wise tracking tool for the Marvel Cinematic Universe. Track main storyline and optional theatrical movies.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:       #08080d;
+            --surface:  #0f0f17;
+            --card:     #13131e;
+            --card-hov: #181826;
+            --border:   rgba(255,255,255,0.06);
+            --gold:     #c9a84c;
+            --gold-dim: rgba(201,168,76,0.18);
+            --gold-glo: rgba(201,168,76,0.35);
+            --red:      #c93a3a;
+            --text:     #dddde8;
+            --muted:    #55556a;
+            --optional: #3e3e52;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 20px 80px; }
+        
+        body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+
+        .wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; }
+
+        /* Header */
+        header { text-align: center; margin-bottom: 56px; }
+        .logo-line { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+        .logo-line::before, .logo-line::after { content: ''; flex: 1; max-width: 120px; height: 1px; background: linear-gradient(to var(--dir, right), transparent, var(--gold)); }
+        .logo-line::before { --dir: right; } .logo-line::after  { --dir: left; }
+        h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 700; letter-spacing: 0.08em; color: #fff; line-height: 1.1; }
+        h1 span { color: var(--gold); }
+        .subtitle { margin-top: 10px; font-size: 13px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+
+        /* Progress bars */
+        .progress-wrap { margin: 28px auto 0; max-width: 360px; }
+        .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+        .progress-bar-bg { height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
+        .progress-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s cubic-bezier(.4,0,.2,1); width: 0%; }
+        #prog-fill-main { background: linear-gradient(90deg, var(--gold), #e8c86e); }
+        #prog-fill-all { background: linear-gradient(90deg, var(--red), #e85d5d); }
+
+        /* Phase heading */
+        .phase-heading { display: flex; align-items: center; gap: 16px; margin: 40px 0 12px; }
+        .phase-label { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+        .phase-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .phase-title { font-size: 13px; color: var(--muted); font-weight: 300; white-space: nowrap; }
+
+        /* Movie row */
+        .movie-row { display: flex; align-items: center; gap: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; padding: 14px 18px; transition: background 0.2s, border-color 0.2s; position: relative; overflow: hidden; }
+        .movie-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); opacity: 0; transition: opacity 0.3s; }
+        .movie-row:hover { background: var(--card-hov); border-color: rgba(255,255,255,0.1); }
+        .movie-row:hover::before { opacity: 0.7; }
+        .movie-row.is-optional::before { background: var(--optional); opacity: 0.5; }
+        .movie-row.is-watched { opacity: 0.5; }
+        .movie-row.is-watched:hover { opacity: 0.7; }
+
+        .row-num { font-size: 11px; color: var(--muted); font-weight: 500; min-width: 28px; font-variant-numeric: tabular-nums; }
+        .row-title { flex: 1; font-size: 14.5px; font-weight: 400; letter-spacing: 0.01em; color: var(--text); transition: color 0.3s; padding: 0 16px 0 10px; }
+        .movie-row.is-watched .row-title { text-decoration: line-through; color: var(--muted); }
+        .optional-badge { display: inline-block; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; margin-right: 8px; vertical-align: middle; position: relative; top: -1px; }
+
+        /* Action buttons */
+        .row-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .action-btn { position: relative; width: 34px; height: 34px; border-radius: 7px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s, border-color 0.2s, transform 0.15s; color: var(--muted); }
+        .action-btn:hover { transform: scale(1.08); color: var(--text); border-color: rgba(255,255,255,0.15); }
+        .action-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: color 0.2s; }
+
+        .action-btn.dl-active { background: var(--gold-dim); border-color: rgba(201,168,76,0.4); color: var(--gold); box-shadow: 0 0 12px var(--gold-glo); }
+        .action-btn.wt-active { background: rgba(58,180,100,0.15); border-color: rgba(58,180,100,0.4); color: #3ab464; box-shadow: 0 0 12px rgba(58,180,100,0.25); }
+        .action-btn:active { transform: scale(0.95); }
+
+        .action-btn::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); background: #1e1e2e; border: 1px solid var(--border); color: var(--text); font-size: 10px; letter-spacing: 0.05em; white-space: nowrap; padding: 4px 8px; border-radius: 4px; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+        .action-btn:hover::after { opacity: 1; }
+
+        footer { text-align: center; margin-top: 52px; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+    </style>
+</head>
+<body>
+<svg style="display: none;">
+    <symbol id="icon-dl" viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M5 21h14"/></symbol>
+    <symbol id="icon-wt" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+
+<div class="wrap">
+    <header>
+        <div class="logo-line">
+            <h1>MCU <span>CLASSIC</span></h1>
+        </div>
+        <p class="subtitle">Theatrical Movies Only · Progress is auto-saved</p>
+        
+        <div class="progress-wrap">
+            <div class="progress-labels">
+                <span style="color: var(--gold);">Main Storyline</span>
+                <span id="prog-text-main">0 / 0 Watched</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="prog-fill-main"></div>
+            </div>
+
+            <div class="progress-labels">
+                <span style="color: var(--red);">All Movies</span>
+                <span id="prog-text-all">0 / 0 Watched</span>
+            </div>
+            <div class="progress-bar-bg" style="background: rgba(255,255,255,0.03);">
+                <div class="progress-bar-fill" id="prog-fill-all"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="phase-heading">
+        <span class="phase-label">Phase 01</span>
+        <span class="phase-title">The Assembly Begins</span>
+    </div>
+    <div class="movie-row" data-id="m1">
+        <span class="row-num">01</span>
+        <span class="row-title">Captain America: The First Avenger</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2011</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m2">
+        <span class="row-num">02</span>
+        <span class="row-title">Iron Man</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2008</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_hulk">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>The Incredible Hulk</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2008</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_im2">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Iron Man 2</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2010</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m3">
+        <span class="row-num">03</span>
+        <span class="row-title">Thor</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2011</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m4">
+        <span class="row-num">04</span>
+        <span class="row-title">The Avengers</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2012</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+
+    <div class="phase-heading">
+        <span class="phase-label">Phase 02</span>
+        <span class="phase-title">Stones & New Threats</span>
+    </div>
+    <div class="movie-row is-optional" data-id="o1">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Iron Man 3</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2013</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_thor2">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Thor: The Dark World</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2013</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m5">
+        <span class="row-num">05</span>
+        <span class="row-title">Captain America: The Winter Soldier</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2014</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m6">
+        <span class="row-num">06</span>
+        <span class="row-title">Guardians of the Galaxy</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2014</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m7">
+        <span class="row-num">07</span>
+        <span class="row-title">Avengers: Age of Ultron</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2015</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m8">
+        <span class="row-num">08</span>
+        <span class="row-title">Ant-Man</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2015</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+
+    <div class="phase-heading">
+        <span class="phase-label">Phase 03</span>
+        <span class="phase-title">The Infinity War & Endgame</span>
+    </div>
+    <div class="movie-row" data-id="m9">
+        <span class="row-num">09</span>
+        <span class="row-title">Captain America: Civil War</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2016</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m10">
+        <span class="row-num">10</span>
+        <span class="row-title">Spider-Man: Homecoming</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2017</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m11">
+        <span class="row-num">11</span>
+        <span class="row-title">Doctor Strange</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2016</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o2">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Guardians of the Galaxy Vol. 2</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2017</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m12">
+        <span class="row-num">12</span>
+        <span class="row-title">Thor: Ragnarok</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2017</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m13">
+        <span class="row-num">13</span>
+        <span class="row-title">Black Panther</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2018</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m14">
+        <span class="row-num">14</span>
+        <span class="row-title">Avengers: Infinity War</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2018</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o3">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Ant-Man and the Wasp</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2018</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_capmar">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Captain Marvel</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2019</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m15">
+        <span class="row-num">15</span>
+        <span class="row-title">Avengers: Endgame</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2019</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m16">
+        <span class="row-num">16</span>
+        <span class="row-title">Spider-Man: Far From Home</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2019</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+
+    <div class="phase-heading">
+        <span class="phase-label">Phase 04</span>
+        <span class="phase-title">The Multiverse Saga - Part I</span>
+    </div>
+    <div class="movie-row is-optional" data-id="o_bw">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Black Widow</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2021</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_shang">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Shang-Chi and the Legend of the Ten Rings</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2021</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_eternals">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Eternals</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2021</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m17_nwh">
+        <span class="row-num">17</span>
+        <span class="row-title">Spider-Man: No Way Home</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2021</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_doc2">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Doctor Strange in the Multiverse of Madness</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2022</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_thor4">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Thor: Love and Thunder</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2022</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_bp2">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Black Panther: Wakanda Forever</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2022</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+
+    <div class="phase-heading">
+        <span class="phase-label">Phase 05</span>
+        <span class="phase-title">The Multiverse Saga - Part II</span>
+    </div>
+    <div class="movie-row is-optional" data-id="o_ant3">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Ant-Man and the Wasp: Quantumania</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2023</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_gotg3">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Guardians of the Galaxy Vol. 3</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2023</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_marvels">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>The Marvels</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2023</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m18_dw">
+        <span class="row-num">18</span>
+        <span class="row-title">Deadpool & Wolverine</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2024</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_cap4">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Captain America: Brave New World</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2025</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_thunder">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Thunderbolts*</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2025</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+
+    <div class="phase-heading">
+        <span class="phase-label">Phase 06</span>
+        <span class="phase-title">The Multiverse Saga - Final Battle</span>
+    </div>
+    <div class="movie-row" data-id="m19_ff">
+        <span class="row-num">19</span>
+        <span class="row-title">The Fantastic Four: First Steps</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2025</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_blade">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Blade</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">TBA</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m20_dd">
+        <span class="row-num">20</span>
+        <span class="row-title">Avengers: Doomsday</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2026</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row is-optional" data-id="o_sp4">
+        <span class="row-num">—</span>
+        <span class="row-title"><span class="optional-badge">Optional</span>Spider-Man 4</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2026</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+    <div class="movie-row" data-id="m21_sw">
+        <span class="row-num">21</span>
+        <span class="row-title">Avengers: Secret Wars</span>
+        <span style="font-size:11px;color:var(--muted);margin-right:12px">2027</span>
+        <div class="row-actions">
+            <button class="action-btn" data-type="dl" data-tip="Download"><svg><use href="#icon-dl"/></svg></button>
+            <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
+        </div>
+    </div>
+
+    <footer>MCU Classic Tracker · <span id="total-films-count">0</span> Movies · Progress auto-saved</footer>
+</div>
+
+<script>
+    // Updated Key to prevent clashes with the Series or Completionist trackers
+    function getKey(rowId, type) { return `mcu-movies-${rowId}-${type}`; }
+
+    function updateProgress() {
+        const mainRows = document.querySelectorAll('.movie-row:not(.is-optional)');
+        const mainTotal = mainRows.length;
+        const mainWatched = Array.from(mainRows).filter(row => row.querySelector('.action-btn[data-type="wt"].wt-active')).length;
+        const mainPct = mainTotal ? (mainWatched / mainTotal * 100) : 0;
+        
+        document.getElementById('prog-fill-main').style.width = mainPct + '%';
+        document.getElementById('prog-text-main').textContent = `${mainWatched} / ${mainTotal} Watched`;
+
+        const allTotal = document.querySelectorAll('.movie-row').length;
+        const allWatched = document.querySelectorAll('.action-btn[data-type="wt"].wt-active').length;
+        const allPct = allTotal ? (allWatched / allTotal * 100) : 0;
+        
+        document.getElementById('prog-fill-all').style.width = allPct + '%';
+        document.getElementById('prog-text-all').textContent = `${allWatched} / ${allTotal} Watched`;
+
+        document.getElementById('total-films-count').textContent = allTotal;
+    }
+
+    function initRow(row) {
+        const id = row.dataset.id;
+        row.querySelectorAll('.action-btn').forEach(btn => {
+            const type = btn.dataset.type;
+            const key = getKey(id, type);
+            const saved = localStorage.getItem(key);
+            
+            if (saved === 'true') {
+                btn.classList.add(type === 'dl' ? 'dl-active' : 'wt-active');
+                if (type === 'wt') row.classList.add('is-watched');
+            }
+            
+            btn.addEventListener('click', () => {
+                const isActive = btn.classList.toggle(type === 'dl' ? 'dl-active' : 'wt-active');
+                localStorage.setItem(key, isActive);
+                if (type === 'wt') {
+                    row.classList.toggle('is-watched', isActive);
+                }
+                updateProgress();
+            });
+        });
+    }
+
+    document.querySelectorAll('.movie-row').forEach(initRow);
+    updateProgress();
+</script>
+</body>
+</html>

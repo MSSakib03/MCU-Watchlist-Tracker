@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCU Chronological Timeline</title>
+    <meta name="description" content="The definitive Marvel Cinematic Universe tracker structured by in-universe chronological order, including Movies, Series, Defenders Saga, Animations, and Shorts.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:       #08080d;
+            --surface:  #0f0f17;
+            --card:     #13131e;
+            --card-hov: #181826;
+            --border:   rgba(255,255,255,0.06);
+            --gold:     #c9a84c;
+            --gold-dim: rgba(201,168,76,0.18);
+            --gold-glo: rgba(201,168,76,0.35);
+            --red:      #c93a3a;
+            --text:     #dddde8;
+            --muted:    #55556a;
+            --optional: #3e3e52;
+            
+            /* Format Badge Colors */
+            --c-movie: #8daeff; --bg-movie: rgba(141, 174, 255, 0.1);
+            --c-series: #c084fc; --bg-series: rgba(192, 132, 252, 0.1);
+            --c-def: #f87171; --bg-def: rgba(248, 113, 113, 0.1);
+            --c-anim: #fbbf24; --bg-anim: rgba(251, 191, 36, 0.1);
+            --c-short: #9ca3af; --bg-short: rgba(156, 163, 175, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 20px 80px; }
+        body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+        .wrap { position: relative; z-index: 1; max-width: 850px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 50px; }
+        .logo-line { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+        .logo-line::before, .logo-line::after { content: ''; flex: 1; max-width: 120px; height: 1px; background: linear-gradient(to var(--dir, right), transparent, var(--gold)); }
+        .logo-line::before { --dir: right; } .logo-line::after { --dir: left; }
+        h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: 0.08em; color: #fff; line-height: 1.1; }
+        h1 span { color: var(--gold); }
+        .subtitle { margin-top: 10px; font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
+
+        .legend-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; }
+        
+        .progress-wrap { margin: 28px auto 0; max-width: 400px; }
+        .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+        .progress-bar-bg { height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
+        .progress-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; width: 0%; }
+        #prog-fill-main { background: linear-gradient(90deg, var(--gold), #e8c86e); }
+        #prog-fill-all { background: linear-gradient(90deg, var(--red), #e85d5d); }
+
+        .phase-heading { display: flex; align-items: center; gap: 16px; margin: 40px 0 12px; }
+        .phase-label { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+        .phase-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .phase-title { font-size: 13px; color: var(--muted); font-weight: 300; }
+
+        .movie-row { display: flex; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; padding: 10px 16px; transition: 0.2s; position: relative; overflow: hidden; }
+        .movie-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); opacity: 0; transition: 0.3s; }
+        .movie-row:hover { background: var(--card-hov); border-color: rgba(255,255,255,0.1); }
+        .movie-row:hover::before { opacity: 0.7; }
+        .movie-row.is-optional::before { background: var(--optional); opacity: 0.5; }
+        .movie-row.is-watched { opacity: 0.45; }
+        .movie-row.is-watched:hover { opacity: 0.7; }
+
+        .row-year { font-size: 12px; color: var(--gold); font-weight: 600; min-width: 48px; font-family: 'Cormorant Garamond', serif; text-align: center;}
+        .row-title { flex: 1; font-size: 14px; font-weight: 400; color: var(--text); padding-left: 14px; }
+        .movie-row.is-watched .row-title { text-decoration: line-through; color: var(--muted); }
+        .optional-badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; margin-right: 8px; vertical-align: middle; }
+
+        .meta-info { display: flex; align-items: center; gap: 8px; margin-right: 16px; }
+        .format-badge { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 6px; border-radius: 4px; font-weight: 600; }
+        .b-movie { background: var(--bg-movie); color: var(--c-movie); border: 1px solid rgba(141,174,255,0.15); }
+        .b-series { background: var(--bg-series); color: var(--c-series); border: 1px solid rgba(192,132,252,0.15); }
+        .b-def { background: var(--bg-def); color: var(--c-def); border: 1px solid rgba(248,113,113,0.15); }
+        .b-anim { background: var(--bg-anim); color: var(--c-anim); border: 1px solid rgba(251,191,36,0.15); }
+        .b-short { background: var(--bg-short); color: var(--c-short); border: 1px solid rgba(156,163,175,0.15); }
+
+        .row-actions { display: flex; gap: 6px; }
+        .action-btn { position: relative; width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: 0.2s; }
+        .action-btn:hover { transform: scale(1.08); color: var(--text); border-color: rgba(255,255,255,0.15); }
+        .action-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .action-btn.dl-active { background: var(--gold-dim); border-color: rgba(201,168,76,0.4); color: var(--gold); box-shadow: 0 0 10px var(--gold-glo); }
+        .action-btn.wt-active { background: rgba(58,180,100,0.15); border-color: rgba(58,180,100,0.4); color: #3ab464; box-shadow: 0 0 10px rgba(58,180,100,0.25); }
+        .action-btn:active { transform: scale(0.95); }
+
+        footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
+    </style>
+</head>
+<body>
+<svg style="display: none;">
+    <symbol id="icon-dl" viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M5 21h14"/></symbol>
+    <symbol id="icon-wt" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+
+<div class="wrap">
+    <header>
+        <div class="logo-line"><h1>MCU <span>CHRONOLOGICAL</span></h1></div>
+        <p class="subtitle">The timeline structured strictly by in-universe dates</p>
+        
+        <div class="legend-box">
+            <span class="format-badge b-movie">Movie</span>
+            <span class="format-badge b-series">Series</span>
+            <span class="format-badge b-def">Defenders Saga</span>
+            <span class="format-badge b-anim">Animation</span>
+            <span class="format-badge b-short">One-Shot/Short</span>
+        </div>
+
+        <div class="progress-wrap">
+            <div class="progress-labels">
+                <span style="color: var(--gold);">Main Storyline</span>
+                <span id="prog-text-main">0 / 0 Watched</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill-main"></div></div>
+
+            <div class="progress-labels">
+                <span style="color: var(--red);">Timeline Completion</span>
+                <span id="prog-text-all">0 / 0 Watched</span>
+            </div>
+            <div class="progress-bar-bg" style="background: rgba(255,255,255,0.03);"><div class="progress-bar-fill" id="prog-fill-all"></div></div>
+        </div>
+    </header>
+
+    <div class="phase-heading"><span class="phase-label">Era 01</span><span class="phase-title">The Distant Past & 20th Century</span></div>
+    
+    <div class="movie-row is-optional" data-id="cr1"><span class="row-year">1260BC+</span><span class="row-title"><span class="optional-badge">Opt</span>Eyes of Wakanda (Episodes 1-4)</span><div class="meta-info"><span class="format-badge b-anim">Animation</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr2"><span class="row-year">1943</span><span class="row-title">Captain America: The First Avenger</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr3"><span class="row-year">1946</span><span class="row-title"><span class="optional-badge">Opt</span>Agent Carter</span><div class="meta-info"><span class="format-badge b-short">One-Shot</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr4"><span class="row-year">1964</span><span class="row-title">The Fantastic Four: First Steps</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr5"><span class="row-year">1995</span><span class="row-title"><span class="optional-badge">Opt</span>Captain Marvel</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+
+    <div class="phase-heading"><span class="phase-label">Era 02</span><span class="phase-title">Fury's Big Week & The Avengers (2010-2012)</span></div>
+    
+    <div class="movie-row" data-id="cr6"><span class="row-year">2010</span><span class="row-title">Iron Man</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr7"><span class="row-year">2011</span><span class="row-title"><span class="optional-badge">Opt</span>Iron Man 2</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr8"><span class="row-year">2011</span><span class="row-title"><span class="optional-badge">Opt</span>The Incredible Hulk</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr9"><span class="row-year">2011</span><span class="row-title"><span class="optional-badge">Opt</span>A Funny Thing Happened...</span><div class="meta-info"><span class="format-badge b-short">One-Shot</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr10"><span class="row-year">2011</span><span class="row-title">Thor</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr11"><span class="row-year">2011</span><span class="row-title"><span class="optional-badge">Opt</span>The Consultant</span><div class="meta-info"><span class="format-badge b-short">One-Shot</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr12"><span class="row-year">2012</span><span class="row-title">The Avengers</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr13"><span class="row-year">2012</span><span class="row-title"><span class="optional-badge">Opt</span>Item 47</span><div class="meta-info"><span class="format-badge b-short">One-Shot</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+
+    <div class="phase-heading"><span class="phase-label">Era 03</span><span class="phase-title">The Age of Miracles (2013-2015)</span></div>
+    
+    <div class="movie-row is-optional" data-id="cr14"><span class="row-year">2013</span><span class="row-title"><span class="optional-badge">Opt</span>Thor: The Dark World</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr15"><span class="row-year">2013</span><span class="row-title"><span class="optional-badge">Opt</span>Iron Man 3</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr16"><span class="row-year">2014</span><span class="row-title"><span class="optional-badge">Opt</span>All Hail the King</span><div class="meta-info"><span class="format-badge b-short">One-Shot</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr17"><span class="row-year">2014</span><span class="row-title">Captain America: The Winter Soldier</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr18"><span class="row-year">2014</span><span class="row-title">Guardians of the Galaxy</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr19"><span class="row-year">2014</span><span class="row-title"><span class="optional-badge">Opt</span>I Am Groot (Episodes 1-10)</span><div class="meta-info"><span class="format-badge b-anim">Animation</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr20"><span class="row-year">2014</span><span class="row-title"><span class="optional-badge">Opt</span>Guardians of the Galaxy Vol. 2</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr21"><span class="row-year">2015</span><span class="row-title"><span class="optional-badge">Opt</span>Daredevil (Season 1)</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr22"><span class="row-year">2015</span><span class="row-title"><span class="optional-badge">Opt</span>Jessica Jones (Season 1)</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr23"><span class="row-year">2015</span><span class="row-title">Avengers: Age of Ultron</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr24"><span class="row-year">2015</span><span class="row-title">Ant-Man</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr25"><span class="row-year">2015</span><span class="row-title"><span class="optional-badge">Opt</span>Daredevil (Season 2)</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr26"><span class="row-year">2015</span><span class="row-title"><span class="optional-badge">Opt</span>Luke Cage (Season 1)</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+
+    <div class="phase-heading"><span class="phase-label">Era 04</span><span class="phase-title">The Sokovia Accords & Infinity War (2016-2018)</span></div>
+    
+    <div class="movie-row is-optional" data-id="cr27"><span class="row-year">2016</span><span class="row-title"><span class="optional-badge">Opt</span>Iron Fist (Season 1) & The Defenders</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr28"><span class="row-year">2016</span><span class="row-title">Captain America: Civil War</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr29"><span class="row-year">2016</span><span class="row-title"><span class="optional-badge">Opt</span>Your Friendly Neighborhood Spider-Man</span><div class="meta-info"><span class="format-badge b-anim">Animation</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr30"><span class="row-year">2016</span><span class="row-title"><span class="optional-badge">Opt</span>Black Widow</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr31"><span class="row-year">2016</span><span class="row-title">Black Panther</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr32"><span class="row-year">2016</span><span class="row-title">Spider-Man: Homecoming</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr33"><span class="row-year">2016</span><span class="row-title"><span class="optional-badge">Opt</span>The Punisher (Season 1)</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr34"><span class="row-year">16-17</span><span class="row-title">Doctor Strange</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr35"><span class="row-year">2017</span><span class="row-title"><span class="optional-badge">Opt</span>Jessica Jones S2 / Luke Cage S2 / Iron Fist S2</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr36"><span class="row-year">2017</span><span class="row-title"><span class="optional-badge">Opt</span>Daredevil (Season 3)</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr37"><span class="row-year">2017</span><span class="row-title">Thor: Ragnarok</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr38"><span class="row-year">2018</span><span class="row-title"><span class="optional-badge">Opt</span>The Punisher S2 / Jessica Jones S3</span><div class="meta-info"><span class="format-badge b-def">Defenders</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr39"><span class="row-year">2018</span><span class="row-title"><span class="optional-badge">Opt</span>Ant-Man and the Wasp</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr40"><span class="row-year">2018</span><span class="row-title">Avengers: Infinity War</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+
+    <div class="phase-heading"><span class="phase-label">Era 05</span><span class="phase-title">The Blip & Aftermath (2023-2024)</span></div>
+    
+    <div class="movie-row" data-id="cr41"><span class="row-year">2023</span><span class="row-title">Avengers: Endgame</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr42"><span class="row-year">2023</span><span class="row-title">Loki (Seasons 1 & 2)</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr43"><span class="row-year">2023</span><span class="row-title"><span class="optional-badge">Opt</span>What If...? / Marvel Zombies</span><div class="meta-info"><span class="format-badge b-anim">Animation</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr44"><span class="row-year">2023</span><span class="row-title">WandaVision</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr45"><span class="row-year">2024</span><span class="row-title">Deadpool & Wolverine</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr46"><span class="row-year">2024</span><span class="row-title"><span class="optional-badge">Opt</span>Shang-Chi and the Legend of the Ten Rings</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr47"><span class="row-year">2024</span><span class="row-title"><span class="optional-badge">Opt</span>The Falcon and the Winter Soldier</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr48"><span class="row-year">2024</span><span class="row-title">Spider-Man: Far From Home</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr49"><span class="row-year">2024</span><span class="row-title"><span class="optional-badge">Opt</span>Eternals</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr50"><span class="row-year">2024</span><span class="row-title">Spider-Man: No Way Home</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr51"><span class="row-year">2024</span><span class="row-title">Doctor Strange in the Multiverse of Madness</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr52"><span class="row-year">2024</span><span class="row-title"><span class="optional-badge">Opt</span>Hawkeye</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+
+    <div class="phase-heading"><span class="phase-label">Era 06</span><span class="phase-title">The Modern MCU & Upcoming (2025-2027)</span></div>
+    
+    <div class="movie-row is-optional" data-id="cr53"><span class="row-year">2025</span><span class="row-title"><span class="optional-badge">Opt</span>Moon Knight</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr54"><span class="row-year">2025</span><span class="row-title"><span class="optional-badge">Opt</span>Black Panther: Wakanda Forever</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr55"><span class="row-year">2025</span><span class="row-title"><span class="optional-badge">Opt</span>Echo / She-Hulk / Ms. Marvel</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr56"><span class="row-year">2025</span><span class="row-title"><span class="optional-badge">Opt</span>Thor: Love and Thunder</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr57"><span class="row-year">2025</span><span class="row-title"><span class="optional-badge">Opt</span>Ironheart / Wonder Man / GotG Holiday Special</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr58"><span class="row-year">2026</span><span class="row-title">Ant-Man and the Wasp: Quantumania</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr59"><span class="row-year">2026</span><span class="row-title"><span class="optional-badge">Opt</span>Guardians of the Galaxy Vol. 3</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr60"><span class="row-year">2026</span><span class="row-title"><span class="optional-badge">Opt</span>Secret Invasion / Agatha All Along</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr61"><span class="row-year">2026</span><span class="row-title"><span class="optional-badge">Opt</span>The Marvels</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr62"><span class="row-year">26-27</span><span class="row-title"><span class="optional-badge">Opt</span>Daredevil: Born Again (Season 1)</span><div class="meta-info"><span class="format-badge b-series">Series</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row is-optional" data-id="cr63"><span class="row-year">2027</span><span class="row-title"><span class="optional-badge">Opt</span>Captain America: Brave New World / Thunderbolts*</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr64"><span class="row-year">TBA</span><span class="row-title">Avengers: Doomsday</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+    <div class="movie-row" data-id="cr65"><span class="row-year">TBA</span><span class="row-title">Avengers: Secret Wars</span><div class="meta-info"><span class="format-badge b-movie">Movie</span></div><div class="row-actions"><button class="action-btn" data-type="dl"><svg><use href="#icon-dl"/></svg></button><button class="action-btn" data-type="wt"><svg><use href="#icon-wt"/></svg></button></div></div>
+
+    <footer>Chronological MCU Tracker · <span id="total-films-count">0</span> Entries · Auto-saved</footer>
+</div>
+
+<script>
+    function getKey(rowId, type) { return `mcu-chrono2-${rowId}-${type}`; }
+    function updateProgress() {
+        const mainRows = document.querySelectorAll('.movie-row:not(.is-optional)');
+        const mainWatched = Array.from(mainRows).filter(r => r.querySelector('.wt-active')).length;
+        document.getElementById('prog-fill-main').style.width = mainRows.length ? (mainWatched / mainRows.length * 100) + '%' : '0%';
+        document.getElementById('prog-text-main').textContent = `${mainWatched} / ${mainRows.length} Watched`;
+
+        const allTotal = document.querySelectorAll('.movie-row').length;
+        const allWatched = document.querySelectorAll('.wt-active').length;
+        document.getElementById('prog-fill-all').style.width = allTotal ? (allWatched / allTotal * 100) + '%' : '0%';
+        document.getElementById('prog-text-all').textContent = `${allWatched} / ${allTotal} Watched`;
+        document.getElementById('total-films-count').textContent = allTotal;
+    }
+    function initRow(row) {
+        const id = row.dataset.id;
+        row.querySelectorAll('.action-btn').forEach(btn => {
+            const type = btn.dataset.type;
+            const key = getKey(id, type); 
+            if (localStorage.getItem(key) === 'true') {
+                btn.classList.add(type === 'dl' ? 'dl-active' : 'wt-active');
+                if (type === 'wt') row.classList.add('is-watched');
+            }
+            btn.addEventListener('click', () => {
+                const isActive = btn.classList.toggle(type === 'dl' ? 'dl-active' : 'wt-active');
+                localStorage.setItem(key, isActive);
+                if (type === 'wt') row.classList.toggle('is-watched', isActive);
+                updateProgress();
+            });
+        });
+    }
+    document.querySelectorAll('.movie-row').forEach(initRow);
+    updateProgress();
+</script>
+</body>
+</html>
