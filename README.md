@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎬 MCU Watchlist Tracker
+# 🎬 MCU Watchlist Tracker Pro Max
 **The Ultimate, Auto-Saving Marvel Cinematic Universe Database & Tracker**
 
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)]()
@@ -9,6 +9,8 @@
 [![Open Source](https://img.shields.io/badge/Open_Source-Yes-brightgreen?style=for-the-badge)]()
 
 *Track your journey through the Multiverse. Zero dependencies, 100% local storage, pure cinematic experience.*
+
+### 🚀 [CLICK HERE FOR LIVE DEMO](https://mssakib03.github.io/MCU-Watchlist-Tracker/)
 
 </div>
 
@@ -21,16 +23,16 @@ Your progress is automatically saved to your browser's local storage. No sign-up
 
 ---
 
-## 🗺️ Choose Your Journey (The 4 Trackers)
+## 🗺️ Choose Your Journey (Live Links)
 
-We have organized the MCU into four distinct tracker files. Click the links below to start your journey:
+We have organized the MCU into four distinct tracker files. Click the links below to start your journey directly on the live website:
 
-| Tracker Version | File Name | Best For... | Content Included | Order Type |
-| :--- | :--- | :--- | :--- | :--- |
-| **[1. The Ultimate MCU Tracker](./index.html)** | `index.html` | The Balanced Fan | Movies + Essential Disney+ Series | Narrative / Release |
-| **[2. Classic Movies Only](./movies-only.html)** | `movies-only.html` | The Casual Viewer | Theatrical Movies Only | Narrative / Release |
-| **[3. The Completionist](./completionist.html)** | `completionist.html` | The Hardcore Fan | Movies, Series, Defenders, Shorts | Narrative / Release |
-| **[4. Strict Chronological](./chronological.html)** | `chronological.html` | The Timeline Nerd | 100% of the MCU | In-Universe Date |
+| Tracker Version | Best For... | Content Included | Live Link |
+| :--- | :--- | :--- | :--- |
+| **1. The Ultimate MCU Tracker** | The Balanced Fan | Movies + Essential Disney+ Series | [🌐 View Ultimate Tracker](https://mssakib03.github.io/MCU-Watchlist-Tracker/) |
+| **2. Classic Movies Only** | The Casual Viewer | Theatrical Movies Only | [🌐 View Classic Tracker](https://mssakib03.github.io/MCU-Watchlist-Tracker/movies-only.html) |
+| **3. The Completionist** | The Hardcore Fan | Movies, Series, Defenders, Shorts | [🌐 View Completionist](https://mssakib03.github.io/MCU-Watchlist-Tracker/completionist.html) |
+| **4. Strict Chronological** | The Timeline Nerd | 100% of the MCU by In-Universe Date | [🌐 View Chronological](https://mssakib03.github.io/MCU-Watchlist-Tracker/chronological.html) |
 
 ---
 
@@ -44,32 +46,13 @@ We have organized the MCU into four distinct tracker files. Click the links belo
 
 ---
 
-## 🚀 How to Use / Host
+## 🚀 How to Run Locally
 
-You don't need to install anything. You have two options:
+You don't need to install anything to run this on your own machine. 
 
-<details>
-<summary><b>Option 1: Play it Locally (Fastest)</b></summary>
-<br>
-1. Download or clone this repository.<br>
-2. Extract the folder.<br>
-3. Double-click on any of the `.html` files (e.g., <code>index.html</code>) to open it in your favorite browser.<br>
-</details>
-
-<details>
-<summary><b>Option 2: Host via GitHub Pages (Free Web Hosting)</b></summary>
-<br>
-1. Fork this repository to your own GitHub account.<br>
-2. Go to your repository's <b>Settings</b>.<br>
-3. Navigate to <b>Pages</b> on the left sidebar.<br>
-4. Under "Source", select the <code>main</code> branch and save.<br>
-5. GitHub will provide you with a live URL to access your tracker from any device!<br>
-</details>
-
----
-
-## 📸 Screenshots
-*(Pro Tip: Once you upload the files to GitHub, take a screenshot of your beautiful UI and add it here by replacing this text with `![Screenshot](./screenshot.jpg)`)*
+1. Download or clone this repository.
+2. Extract the folder.
+3. Double-click on any of the `.html` files (e.g., `index.html`) to open it in your favorite browser.
 
 ---
 
