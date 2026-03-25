@@ -99,7 +99,7 @@
     <symbol id="icon-wt" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
 </svg>
 
-<nav class="site-nav" data-page="REPLACE_ME">
+<nav class="site-nav" data-page="movies">
     <div class="nav-inner">
         <a href="index.html" class="nav-link" data-key="home">
             <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -407,7 +407,7 @@
             <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
         </div>
     </div>
-    <div class="movie-row" data-id="m17_nwh">
+    <div class="movie-row" data-id="m19_nwh">
         <span class="row-num">17</span>
         <span class="row-title">Spider-Man: No Way Home</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2021</span>
@@ -416,7 +416,7 @@
             <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
         </div>
     </div>
-    <div class="movie-row is-optional" data-id="o_doc2">
+    <div class="movie-row is-optional" data-id="m20_doc2">
         <span class="row-num">—</span>
         <span class="row-title"><span class="optional-badge">Optional</span>Doctor Strange in the Multiverse of Madness</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2022</span>
@@ -448,7 +448,7 @@
         <span class="phase-label">Phase 05</span>
         <span class="phase-title">The Multiverse Saga - Part II</span>
     </div>
-    <div class="movie-row is-optional" data-id="o_ant3">
+    <div class="movie-row is-optional" data-id="m21_ant3">
         <span class="row-num">—</span>
         <span class="row-title"><span class="optional-badge">Optional</span>Ant-Man and the Wasp: Quantumania</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2023</span>
@@ -475,7 +475,7 @@
             <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
         </div>
     </div>
-    <div class="movie-row" data-id="m18_dw">
+    <div class="movie-row" data-id="m23_dw">
         <span class="row-num">18</span>
         <span class="row-title">Deadpool & Wolverine</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2024</span>
@@ -484,7 +484,7 @@
             <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
         </div>
     </div>
-    <div class="movie-row is-optional" data-id="o_cap4">
+    <div class="movie-row is-optional" data-id="m24_cap4">
         <span class="row-num">—</span>
         <span class="row-title"><span class="optional-badge">Optional</span>Captain America: Brave New World</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2025</span>
@@ -507,7 +507,7 @@
         <span class="phase-label">Phase 06</span>
         <span class="phase-title">The Multiverse Saga - Final Battle</span>
     </div>
-    <div class="movie-row" data-id="m19_ff">
+    <div class="movie-row" data-id="m25_ff">
         <span class="row-num">19</span>
         <span class="row-title">The Fantastic Four: First Steps</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2025</span>
@@ -525,7 +525,7 @@
             <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
         </div>
     </div>
-    <div class="movie-row" data-id="m20_dd">
+    <div class="movie-row" data-id="m26_dd">
         <span class="row-num">20</span>
         <span class="row-title">Avengers: Doomsday</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2026</span>
@@ -543,7 +543,7 @@
             <button class="action-btn" data-type="wt" data-tip="Watched"><svg><use href="#icon-wt"/></svg></button>
         </div>
     </div>
-    <div class="movie-row" data-id="m21_sw">
+    <div class="movie-row" data-id="m27_sw">
         <span class="row-num">21</span>
         <span class="row-title">Avengers: Secret Wars</span>
         <span style="font-size:11px;color:var(--muted);margin-right:12px">2027</span>
@@ -557,7 +557,8 @@
 </div>
 
 <script>
-    function getKey(rowId, type) { return `mcu-movies-${rowId}-${type}`; }
+    /* Modified getKey to use global prefix */
+    function getKey(rowId, type) { return `mcu-global-${rowId}-${type}`; }
 
     function updateProgress() {
         const mainRows = document.querySelectorAll('.movie-row:not(.is-optional)');
