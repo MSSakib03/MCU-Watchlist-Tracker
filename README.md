@@ -16,8 +16,16 @@
 
 ---
 
+## 📸 Interface Preview
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/400a1c19-8d5e-439d-9237-13ce5e978c6e" alt="MCU Tracker Main UI" width="48%">
+  <img src="https://github.com/user-attachments/assets/0fca2b38-58f1-4c36-90c0-67d098b774b3" alt="MCU Chronological UI" width="48%">
+</div>
+
+---
+
 ## 🌟 Why This Tracker?
-The Marvel Cinematic Universe is massive. Figuring out what to watch, what is optional, and what order to watch them in can be overwhelming. This project solves that problem with **four tailored experiences** ranging from casual movie-goers to hardcore completionists.
+The Marvel Cinematic Universe is massive. Figuring out what to watch, what is optional, and what order to watch them in can be overwhelming. This project solves that problem with **five tailored experiences** ranging from casual movie-goers to hardcore completionists.
 
 Your progress is automatically saved to your browser's local storage. No sign-ups, no databases, no hassle.
 
@@ -25,7 +33,7 @@ Your progress is automatically saved to your browser's local storage. No sign-up
 
 ## 🗺️ Choose Your Journey (Live Links)
 
-We have organized the MCU into four distinct tracker files. Click the links below to start your journey directly on the live website:
+We have organized the MCU into distinct tracker files and a visual map. Click the links below to start your journey directly on the live website:
 
 | Tracker Version | Best For... | Content Included | Live Link |
 | :--- | :--- | :--- | :--- |
@@ -33,11 +41,15 @@ We have organized the MCU into four distinct tracker files. Click the links belo
 | **2. Classic Movies Only** | The Casual Viewer | Theatrical Movies Only | [🌐 View Classic Tracker](https://mssakib03.github.io/MCU-Watchlist-Tracker/movies-only.html) |
 | **3. The Completionist** | The Hardcore Fan | Movies, Series, Defenders, Shorts | [🌐 View Completionist](https://mssakib03.github.io/MCU-Watchlist-Tracker/completionist.html) |
 | **4. Strict Chronological** | The Timeline Nerd | 100% of the MCU by In-Universe Date | [🌐 View Chronological](https://mssakib03.github.io/MCU-Watchlist-Tracker/chronological.html) |
+| **5. Thematic Flowchart** | The Visual Learner | Visual narrative tree & connections | [🗺️ View Flowchart](https://mssakib03.github.io/MCU-Watchlist-Tracker/flowchart.html) |
+
+*(Want to see the full flowchart structure offline? [View the Flowchart Image here](./flowchart.png))*
 
 ---
 
 ## ✨ Features That Stand Out
 
+* **🗺️ Visual Narrative Tree:** A fully responsive, pure CSS/HTML flowchart that maps out the branching storylines of the Infinity and Multiverse sagas.
 * **🧠 Smart Categorization:** Titles are clearly marked as **Main Storyline** (crucial for Avengers/Multiverse events) or **Optional** (great character building, but skippable for the main plot).
 * **💾 Local Storage Auto-Save:** Close the browser, restart your PC—your checkboxes (Downloaded ⬇️ & Watched 👁️) will remain exactly as you left them.
 * **🎨 Premium UI/UX:** A minimalist, dark-themed cinematic design using the `Cormorant Garamond` and `DM Sans` fonts, complete with subtle noise textures and glowing active states.

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCU Architecture Flowchart</title>
+    <meta name="description" content="The Marvel Cinematic Universe structural flowchart and thematic narrative paths.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:       #08080d;
+            --surface:  #0f0f17;
+            --card:     #13131e;
+            --card-hov: #181826;
+            --border:   rgba(255,255,255,0.08);
+            --gold:     #c9a84c;
+            --gold-dim: rgba(201,168,76,0.18);
+            --gold-glo: rgba(201,168,76,0.35);
+            --red:      #c93a3a;
+            --text:     #dddde8;
+            --muted:    #55556a;
+            --line:     rgba(255,255,255,0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { 
+            font-family: 'DM Sans', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            min-height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 100px 0;
+            position: relative;
+        }
+        
+        body::before { 
+            content: ''; position: fixed; inset: 0; 
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); 
+            pointer-events: none; z-index: 0; opacity: 0.4; 
+        }
+
+        /* ── Absolute Top Sticky Navigation Bar ── */
+        .site-nav { 
+            position: sticky; 
+            top: 0; 
+            width: 100%;
+            z-index: 1000; 
+            display: flex;
+            justify-content: center;
+            background: rgba(8, 8, 13, 0.85); 
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            margin-bottom: 50px;
+        }
+        .nav-inner { 
+            display: flex; 
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px; 
+            background: rgba(15, 15, 23, 0.6); 
+            border: 1px solid rgba(255,255,255,0.06); 
+            border-radius: 12px; 
+            padding: 6px 10px; 
+        }
+        .nav-link { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #55556a; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: #dddde8; background: rgba(255,255,255,0.05); }
+        .nav-link.active { 
+            color: var(--gold); 
+            background: rgba(201,168,76,0.1); 
+            border-bottom: 2px solid var(--gold); 
+            border-bottom-left-radius: 2px;
+            border-bottom-right-radius: 2px;
+        }
+        .nav-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; opacity: 0.8; }
+        .nav-sep { width: 1px; height: 16px; background: rgba(255,255,255,0.06); margin: 0 4px; align-self: center; }
+
+        .container {
+            width: 100%; 
+            max-width: 1050px; 
+            min-width: 900px;
+            position: relative;
+            z-index: 1;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header-title { text-align: center; font-family: 'Cormorant Garamond', serif; font-weight: 700; letter-spacing: 0.1em; font-size: clamp(2rem, 5vw, 2.8rem); color: #fff; margin-bottom: 8px; line-height: 1.1; }
+        .header-sub { text-align: center; font-weight: 400; letter-spacing: 0.1em; font-size: 13px; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; }
+
+        /* Format Tags / Legends */
+        .legend-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 60px; }
+        .legend-item { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+        
+        .tag { display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 5px; border-radius: 4px; vertical-align: middle; margin-left: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .t-mov { background: rgba(141,174,255,0.15); color: #8daeff; border: 1px solid rgba(141,174,255,0.3); }
+        .t-ser { background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
+        .t-def { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+        .t-ani { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+        .t-sho { background: rgba(156,163,175,0.15); color: #9ca3af; border: 1px solid rgba(156,163,175,0.3); }
+
+        /* Grids */
+        .grid-4 { display: grid; grid-template-columns: 1fr 1.3fr 1fr 1fr; position: relative;}
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; position: relative;}
+        
+        .track { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; }
+        .track-title { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 20px; text-align: center; text-transform: uppercase; font-weight: 600; }
+        .center-col { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+        /* Nodes */
+        .node { background: var(--card); border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px; font-size: 13px; color: var(--text); position: relative; text-align: center; z-index: 2; width: max-content; max-width: 210px; line-height: 1.5; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .node:hover { border-color: rgba(255,255,255,0.15); background: var(--card-hov); transform: translateY(-2px); }
+        .node.main { border-color: var(--gold-dim); color: var(--gold); font-weight: 500; background: rgba(201,168,76,0.05); box-shadow: 0 0 20px var(--gold-glo); font-size: 14px; }
+        .node.main:hover { border-color: var(--gold); }
+        .node.speculative { border-style: dashed; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.02); }
+        .node.crossover { border-style: dashed; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.04); }
+
+        /* Lines */
+        .v-line { width: 2px; background: var(--line); min-height: 25px; z-index: 1; }
+        .v-line.grow { flex-grow: 1; min-height: 30px; }
+        .v-line.dashed { width: 0; background: transparent; border-left: 2px dashed rgba(255,255,255,0.15); }
+
+        .h-merge-4 { width: 75%; border-top: 2px solid var(--line); margin: 0 auto; }
+        .h-merge-3 { width: 66.66%; border-top: 2px solid var(--line); margin: 0 auto; }
+
+        /* ── Branches ── */
+        .branch { position: absolute; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); white-space: nowrap; font-weight: 400; }
+
+        .branch.right { left: calc(100% + 20px); text-align: left; padding-left: 8px; }
+        .branch.right::before { content: ''; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background: var(--line); }
+        .branch.right::after { content: ''; position: absolute; top: 50%; left: -3px; transform: translateY(-50%); border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 5px solid var(--muted); }
+
+        .branch.left { right: calc(100% + 20px); text-align: right; padding-right: 8px; }
+        .branch.left::before { content: ''; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: var(--line); }
+        .branch.left::after { content: ''; position: absolute; top: 50%; right: -3px; transform: translateY(-50%); border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-right: 5px solid var(--muted); }
+
+        .branch-group { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; font-weight: 400; }
+
+        .branch-group.right { left: calc(100% + 20px); border-left: 2px solid var(--line); padding-left: 15px; text-align: left; }
+        .branch-group.right::before { content: ''; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background: var(--line); }
+
+        .branch-group.left { right: calc(100% + 20px); border-right: 2px solid var(--line); padding-right: 15px; align-items: flex-end; text-align: right; }
+        .branch-group.left::before { content: ''; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: var(--line); }
+
+        .branch-item { font-size: 12px; color: var(--muted); white-space: nowrap; position: relative; transition: color 0.2s; display: flex; align-items: center; }
+        .branch-item:hover { color: var(--text); }
+
+        .branch-group.right .branch-item { justify-content: flex-start; padding-left: 8px; }
+        .branch-group.right .branch-item::before { content: ''; position: absolute; top: 50%; left: -15px; width: 15px; height: 2px; background: var(--line); }
+        .branch-group.right .branch-item::after { content: ''; position: absolute; top: 50%; left: -3px; transform: translateY(-50%); border-top: 3px solid transparent; border-bottom: 3px solid transparent; border-left: 4px solid var(--muted); }
+
+        .branch-group.left .branch-item { justify-content: flex-end; padding-right: 8px; }
+        .branch-group.left .branch-item::before { content: ''; position: absolute; top: 50%; right: -15px; width: 15px; height: 2px; background: var(--line); }
+        .branch-group.left .branch-item::after { content: ''; position: absolute; top: 50%; right: -3px; transform: translateY(-50%); border-top: 3px solid transparent; border-bottom: 3px solid transparent; border-right: 4px solid var(--muted); }
+
+        /* Utilities */
+        .st { color: #888; font-size: 10px; display: block; margin-top: 4px; }
+        .st-inline { color: #888; font-size: 10px; }
+
+        .saga-divider { margin: 80px 0 50px 0; text-align: center; position: relative; }
+        .saga-divider::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: var(--border); z-index: 1; }
+        .saga-divider span { background: var(--bg); padding: 0 20px; color: var(--muted); font-size: 13px; letter-spacing: 0.2em; position: relative; z-index: 2; font-weight: 500; }
+
+        /* Multiverse connection hint */
+        .multiverse-hint {
+            font-size: 9px; color: #6d28d9; letter-spacing: 0.12em; text-transform: uppercase;
+            background: var(--bg); padding: 3px 10px; z-index: 2;
+            border: 1px solid rgba(109,40,217,0.25); border-radius: 3px;
+        }
+        /* Crossover badge */
+        .crossover-badge {
+            position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+            font-size: 9px; background: #0d0d18; padding: 1px 8px;
+            color: #f87171; letter-spacing: 0.1em; white-space: nowrap;
+            border: 1px solid rgba(239,68,68,0.35); border-radius: 3px;
+        }
+
+        /* ── Captain Marvel: branches off the v-line below CA:TFA ── */
+        .capmar-wrap {
+            position: relative;
+            width: 2px;
+            height: 120px;
+            background: var(--line);
+            align-self: center;
+            flex-shrink: 0;
+        }
+        .capmar-branch {
+            position: absolute;
+            top: 15px;
+            left: 2px;
+            padding-left: 22px;
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+        .capmar-branch::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 0;
+            width: 18px; height: 2px;
+            background: var(--line);
+            transform: translateY(-50%);
+        }
+        .capmar-branch::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 15px;
+            transform: translateY(-50%);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            border-left: 5px solid var(--muted);
+        }
+
+        /* SVG Overlay for Connections */
+        .svg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .connection-line {
+            fill: none;
+            stroke: rgba(255,255,255,0.15);
+            stroke-width: 2;
+        }
+        .connection-line-dashed {
+            fill: none;
+            stroke: rgba(201,168,76,0.3); /* Goldish hint for Shang-Chi */
+            stroke-width: 1.5;
+            stroke-dasharray: 4, 4;
+        }
+        .connection-line-purple {
+            fill: none;
+            stroke: rgba(192,132,252,0.3); /* Purple hint for Ms. Marvel */
+            stroke-width: 1.5;
+        }
+
+
+        @media (max-width: 1000px) {
+            body { overflow-x: auto; align-items: flex-start; }
+            .site-nav { min-width: 900px; justify-content: flex-start; padding-left: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="site-nav" data-page="flowchart">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-link" data-key="home">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Main Storyline
+        </a>
+        <div class="nav-sep"></div>
+        <a href="movies-only.html" class="nav-link" data-key="movies">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+            Movies Only
+        </a>
+        <div class="nav-sep"></div>
+        <a href="completionist.html" class="nav-link" data-key="complete">
+            <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Completionist
+        </a>
+        <div class="nav-sep"></div>
+        <a href="chronological.html" class="nav-link" data-key="chrono">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Chronological
+        </a>
+        <div class="nav-sep"></div>
+        <a href="flowchart.html" class="nav-link" data-key="flowchart">
+            <svg viewBox="0 0 24 24"><path d="M6 3v6"/><path d="M18 3v6"/><path d="M12 13v8"/><path d="M18 9h-12c-1.1 0-2 .9-2 2v2"/><path d="M12 9v4"/><rect x="4" y="2" width="4" height="4" rx="1"/><rect x="16" y="2" width="4" height="4" rx="1"/><rect x="10" y="17" width="4" height="4" rx="1"/></svg>
+            Flowchart
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="header-title">MARVEL CINEMATIC UNIVERSE</div>
+    <div class="header-sub">Thematic Architecture Flowchart</div>
+
+    <div class="legend-box">
+        <div class="legend-item"><span class="tag t-mov">M</span> Movie</div>
+        <div class="legend-item"><span class="tag t-ser">TV</span> Series</div>
+        <div class="legend-item"><span class="tag t-def">DEF</span> Defenders Saga</div>
+        <div class="legend-item"><span class="tag t-ani">A</span> Animation</div>
+        <div class="legend-item"><span class="tag t-sho">S</span> Short/One-Shot</div>
+    </div>
+
+    <div class="grid-4">
+
+        <div class="track">
+            <div class="track-title">[ Iron Man Path ]</div>
+            <div class="v-line" style="height: 100px; background:transparent;"></div>
+            <div class="node">Iron Man (2008) <span class="tag t-mov">M</span></div>
+            <div class="v-line" style="height: 50px;"></div>
+            <div class="node">Iron Man 2 (2010) <span class="tag t-mov">M</span></div>
+            <div class="v-line grow"></div>
+        </div>
+
+        <div class="track">
+            <div class="track-title">[ Captain America Path ]</div>
+            <div class="v-line" style="height: 10px; background:transparent;"></div>
+            <div class="node">Captain America:<br>The First Avenger (2011) <span class="tag t-mov">M</span><span class="st">(st. 1940s)</span></div>
+            <div class="capmar-wrap">
+                <div class="capmar-branch">Captain Marvel (2019) <span class="tag t-mov">M</span> <span class="st-inline">(st. 1995)</span></div>
+            </div>
+            <div class="v-line grow"></div>
+        </div>
+
+        <div class="track">
+            <div class="track-title">[ Thor Path ]</div>
+            <div class="v-line" style="height: 220px; background:transparent;"></div>
+            <div class="node">Thor (2011) <span class="tag t-mov">M</span></div>
+            <div class="v-line grow"></div>
+        </div>
+
+        <div class="track">
+            <div class="track-title">[ Other Heroes ]</div>
+            <div class="v-line" style="height: 100px; background:transparent;"></div>
+            <div class="node">The Incredible Hulk (2008) <span class="tag t-mov">M</span></div>
+            <div class="v-line dashed grow"></div>
+        </div>
+
+    </div><div class="h-merge-4"></div>
+
+    <div class="center-col">
+        <div class="v-line" style="height: 25px;"></div>
+        <div class="node main">The Avengers (2012) <span class="tag t-mov">M</span></div>
+        <div class="v-line" style="height: 25px;"></div>
+    </div>
+
+    <div class="h-merge-4"></div>
+
+    <div class="grid-4">
+        <div class="track">
+            <div class="v-line" style="height: 25px;"></div>
+            <div class="node">Iron Man 3 (2013) <span class="tag t-mov">M</span></div>
+            <div class="v-line grow"></div>
+        </div>
+        <div class="track">
+            <div class="v-line" style="height: 25px;"></div>
+            <div class="node">Captain America:<br>Winter Soldier (2014) <span class="tag t-mov">M</span></div>
+            <div class="v-line grow"></div>
+        </div>
+        <div class="track">
+            <div class="v-line" style="height: 25px;"></div>
+            <div class="node">Thor: The Dark World (2013) <span class="tag t-mov">M</span></div>
+            <div class="v-line grow"></div>
+        </div>
+        <div class="track">
+            <div class="v-line" style="height: 25px;"></div>
+            <div class="node">Guardians of the Galaxy (2014) <span class="tag t-mov">M</span>
+                <div class="branch right">&nbsp; GotG Vol. 2 (2017) <span class="tag t-mov">M</span> <span class="st-inline">(st. 2014)</span></div>
+            </div>
+            <div class="v-line grow"></div>
+        </div>
+    </div>
+
+    <div class="h-merge-4"></div>
+
+    <div class="center-col">
+        <div class="v-line" style="height: 25px;"></div>
+        <div class="node main">Avengers: Age of Ultron (2015) <span class="tag t-mov">M</span>
+            <div class="branch right">&nbsp; Ant-Man (2015) <span class="tag t-mov">M</span></div>
+        </div>
+        <div class="v-line" style="height: 35px;"></div>
+
+        <div class="node main">Captain America: Civil War (2016) <span class="tag t-mov">M</span>
+            <div class="branch-group right">
+                <div class="branch-item">&nbsp; Black Widow (2021) <span class="tag t-mov">M</span> <span class="st-inline">(st. 2016)</span></div>
+                <div class="branch-item">&nbsp; Black Panther (2018) <span class="tag t-mov">M</span></div>
+                <div class="branch-item">&nbsp; Spider-Man: Homecoming (2017) <span class="tag t-mov">M</span></div>
+                <div class="branch-item">&nbsp; Doctor Strange (2016) <span class="tag t-mov">M</span></div>
+                <div class="branch-item">&nbsp; Thor: Ragnarok (2017) <span class="tag t-mov">M</span></div>
+                <div class="branch-item">&nbsp; Ant-Man and the Wasp (2018) <span class="tag t-mov">M</span></div>
+            </div>
+        </div>
+        <div class="v-line" style="height: 35px;"></div>
+
+        <div class="node main">Avengers: Infinity War (2018) <span class="tag t-mov">M</span></div>
+
+        <div class="v-line" style="height: 15px;"></div>
+        <div style="font-size: 10px; color: var(--muted); background: var(--bg); padding: 4px 0; z-index: 2; letter-spacing: 1px;">(5 YEAR TIME JUMP)</div>
+        <div class="v-line" style="height: 15px;"></div>
+
+        <div class="node main">Avengers: Endgame (2019) <span class="tag t-mov">M</span>
+            <div class="branch right">&nbsp; Spider-Man: Far From Home (2019) <span class="tag t-mov">M</span></div>
+        </div>
+
+        <div class="v-line dashed" style="height: 40px;"></div>
+
+    </div><div class="saga-divider" style="margin-top: 0;">
+        <span>THE MULTIVERSE SAGA</span>
+    </div>
+
+    <div class="center-col">
+        <div class="v-line dashed" style="height: 30px;"></div>
+        <div class="node" style="border-color: #5b21b6; color: #a78bfa; background: rgba(91,33,182,0.08); box-shadow: 0 0 25px rgba(91,33,182,0.3); font-size:14px; font-weight:500;">
+            Loki (Seasons 1 &amp; 2) <span class="tag t-ser">TV</span><br>
+            <span class="st" style="color:#8b5cf6;">[The Catalyst]</span>
+        </div>
+        <div class="v-line" style="height: 25px;"></div>
+    </div>
+
+    <div class="h-merge-3"></div>
+
+    <div class="grid-3" id="multiverse-grid">
+        
+        <svg class="svg-overlay" id="connection-svg">
+            <defs>
+                <marker id="arrowhead-gold" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+                    <polygon points="0 0, 6 2, 0 4" fill="rgba(201,168,76,0.3)" />
+                </marker>
+                <marker id="arrowhead-purple" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+                    <polygon points="0 0, 6 2, 0 4" fill="rgba(192,132,252,0.3)" />
+                </marker>
+            </defs>
+            <path id="path-shangchi-quantumania" class="connection-line-dashed" marker-end="url(#arrowhead-gold)" d=""></path>
+            <path id="path-msmarvel-themarvels" class="connection-line-purple" marker-end="url(#arrowhead-purple)" d=""></path>
+        </svg>
+
+        <div class="track">
+            <div class="track-title">[ Earth / Street-Level ]</div>
+
+            <div class="v-line" style="height: 25px;"></div>
+            <div class="node" style="border-color: rgba(201,58,58,0.3); background: rgba(201,58,58,0.04);">
+                The Defenders Saga <span class="tag t-def">DEF</span>
+                <span class="st" style="color:#f87171; font-size:9px; letter-spacing:0.06em;">[Soft Canon — Pre-MCU Disney+]</span>
+                <div class="branch-group left">
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Daredevil (S1–3)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Jessica Jones (S1–3)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Luke Cage (S1–2)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Iron Fist (S1–2)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> The Punisher (S1–2)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> The Defenders</div>
+                </div>
+            </div>
+
+            <div class="v-line" style="height: 50px;"></div>
+            <div class="node">Falcon &amp; Winter Soldier (2021) <span class="tag t-ser">TV</span>
+                <div class="branch-group left">
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Hawkeye (2021)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Echo (2024)</div>
+                </div>
+            </div>
+
+            <div class="v-line" style="height: 86px;"></div>
+            <div class="node">Wakanda Forever (2022) <span class="tag t-mov">M</span>
+                <div class="branch-group left">
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Moon Knight (2022)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> She-Hulk (2022)</div>
+                </div>
+            </div>
+
+            <div class="v-line" style="height: 100px;"></div>
+            <div class="node">Secret Invasion (2023) <span class="tag t-ser">TV</span></div>
+
+            <div class="v-line" style="height: 155px;"></div>
+            <div class="node speculative">Captain America:<br>Brave New World (2025) <span class="tag t-mov">M</span></div>
+
+            <div class="v-line" style="height: 55px;"></div>
+            <div class="node speculative">Thunderbolts* (2025) <span class="tag t-mov">M</span>
+                <div class="branch-group left">
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Daredevil: Born Again (2025)</div>
+                    <div class="branch-item"><span class="tag t-ser">TV</span> Ironheart (2025)</div>
+                </div>
+            </div>
+            <div class="v-line grow"></div>
+        </div>
+
+        <div class="track">
+            <div class="track-title">[ Multiverse &amp; Magic ]</div>
+
+            <div class="v-line" style="height: 25px;"></div>
+            <div class="node">WandaVision (2021) <span class="tag t-ser">TV</span>
+            </div>
+
+            <div class="v-line" style="height: 50px;"></div>
+            <div class="node">Spider-Man: No Way Home (2021) <span class="tag t-mov">M</span>
+            </div>
+
+            <div class="v-line" style="height: 66px;"></div>
+            <div class="node">Doctor Strange: MoM (2022) <span class="tag t-mov">M</span>
+            </div>
+
+            <div class="v-line" style="height: 80px;"></div>
+            <div class="node main" id="node-quantumania">Ant-Man: Quantumania (2023) <span class="tag t-mov">M</span>
+            </div>
+
+            <div class="v-line" style="height: 60px;"></div>
+            <div class="node crossover">
+                <span class="crossover-badge">MULTIVERSE CROSSOVER</span>
+                Deadpool &amp; Wolverine (2024) <span class="tag t-mov">M</span>
+                <span class="st" style="font-size:9px; color:#f87171;">Outside main MCU timeline</span>
+                <div class="branch right">&nbsp; Agatha All Along (2024) <span class="tag t-ser">TV</span></div>
+            </div>
+
+            <div class="v-line" style="height: 55px;"></div>
+            <div class="node speculative">Fantastic Four: First Steps (2025) <span class="tag t-mov">M</span>
+                <div class="branch right">&nbsp; Spider-Man 4 (2026) <span class="tag t-mov">M</span></div>
+            </div>
+            <div class="v-line grow"></div>
+        </div>
+
+        <div class="track">
+            <div class="track-title">[ Cosmic &amp; Others ]</div>
+
+            <div class="v-line" style="height: 25px;"></div>
+            <div class="node" id="node-shangchi">Shang-Chi (2021) <span class="tag t-mov">M</span>
+                <div class="branch-group right">
+                    <div class="branch-item">&nbsp; Eternals (2021) <span class="tag t-mov">M</span></div>
+                    <div class="branch-item">&nbsp; Thor: Love &amp; Thunder (2022) <span class="tag t-mov">M</span></div>
+                    <div class="branch-item">&nbsp; GotG Holiday Special (2022) <span class="tag t-sho">S</span></div>
+                </div>
+            </div>
+
+            <div class="v-line" style="height: 181px;"></div>
+            <div class="node" id="node-msmarvel">Ms. Marvel (2022) <span class="tag t-ser">TV</span>
+            </div>
+
+            <div class="v-line" style="height: 100px;"></div>
+            <div class="node">GotG Vol. 3 (2023) <span class="tag t-mov">M</span></div>
+
+            <div class="v-line" style="height: 50px;"></div>
+            <div class="node" id="node-themarvels">The Marvels (2023) <span class="tag t-mov">M</span>
+            </div>
+            <div class="v-line grow"></div>
+        </div>
+
+    </div><div class="h-merge-3"></div>
+
+    <div class="center-col">
+        <div class="v-line" style="height: 25px;"></div>
+        <div class="node main speculative">Avengers: Doomsday (2026) <span class="tag t-mov">M</span></div>
+        <div class="v-line" style="height: 25px;"></div>
+        <div class="node main speculative">Avengers: Secret Wars (2027) <span class="tag t-mov">M</span></div>
+    </div>
+
+    <div class="saga-divider" style="margin-top: 100px; margin-bottom: 30px;">
+        <span>ALTERNATE UNIVERSES</span>
+    </div>
+    <div style="font-size: 13px; color: var(--muted); text-align: center; line-height: 2;">
+        • <strong>What If...? (Season 1–3) <span class="tag t-ani">A</span></strong> : Parallel Animated Timelines.<br>
+        • <strong>Marvel Zombies (2025) <span class="tag t-ani">A</span></strong> : Zombie Universe Timeline.<br>
+        • <strong>Friendly Neighborhood Spider-Man (2025) <span class="tag t-ani">A</span></strong> : Alternate Peter Parker Animated Story.
+    </div>
+</div><script>
+    /* Active Nav Highlight Script */
+    (function() {
+        const nav = document.querySelector('.site-nav');
+        if (!nav) return;
+        const page = nav.dataset.page;
+        const link = nav.querySelector(`.nav-link[data-key="${page}"]`);
+        if (link) link.classList.add('active');
+    })();
+
+    /* Draw SVG Connections */
+    function drawConnections() {
+        const grid = document.getElementById('multiverse-grid');
+        const svg = document.getElementById('connection-svg');
+        const gridRect = grid.getBoundingClientRect();
+        
+        // Helper to get relative coordinates
+        function getCoords(element, anchorX, anchorY) {
+            const rect = element.getBoundingClientRect();
+            return {
+                x: rect.left - gridRect.left + (rect.width * anchorX),
+                y: rect.top - gridRect.top + (rect.height * anchorY)
+            };
+        }
+
+        // 1. Shang-Chi (Col 3) to Quantumania (Col 2)
+        const shangchi = document.getElementById('node-shangchi');
+        const quantumania = document.getElementById('node-quantumania');
+        
+        if(shangchi && quantumania) {
+            // Start from bottom-left of Shang-Chi, end at top-right of Quantumania
+            const start1 = getCoords(shangchi, 0.2, 1);
+            const end1 = getCoords(quantumania, 0.8, 0);
+            const path1 = document.getElementById('path-shangchi-quantumania');
+            // Cubic bezier curve for a smooth diagonal connection
+            path1.setAttribute('d', `M ${start1.x},${start1.y} C ${start1.x},${start1.y + 50} ${end1.x},${end1.y - 50} ${end1.x},${end1.y}`);
+        }
+
+        // 2. Ms. Marvel (Col 3) to The Marvels (Col 3)
+        const msmarvel = document.getElementById('node-msmarvel');
+        const themarvels = document.getElementById('node-themarvels');
+        
+        if(msmarvel && themarvels) {
+            // Start from right of Ms. Marvel, curve down, enter right of The Marvels
+            const start2 = getCoords(msmarvel, 1, 0.5);
+            const end2 = getCoords(themarvels, 1, 0.5);
+            const path2 = document.getElementById('path-msmarvel-themarvels');
+            // Path that goes right, down, then left
+            const offset = 40; // How far to the right it bows out
+            path2.setAttribute('d', `M ${start2.x},${start2.y} L ${start2.x + offset},${start2.y} L ${start2.x + offset},${end2.y} L ${end2.x + 5},${end2.y}`);
+        }
+    }
+
+    // Draw on load and window resize
+    window.addEventListener('load', drawConnections);
+    window.addEventListener('resize', drawConnections);
+</script>
+</body>
+</html>
